@@ -1,0 +1,75 @@
+import subprocess
+import os
+
+def check_dependencies():
+    """
+    Vérifie si Wifite est installé et disponible sur le système.
+    """
+    try:
+        subprocess.run(["wifite", "--help"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("[INFO] Wifite est installé et prêt à être utilisé.")
+    except FileNotFoundError:
+        print("[ERREUR] Wifite n'est pas installé. Veuillez l'installer avec : sudo apt install wifite")
+        exit(1)
+
+def start_scan():
+    """
+    Lance un scan des réseaux Wi-Fi à proximité à l'aide de Wifite.
+    """
+    print("[INFO] Début du scan des réseaux Wi-Fi...")
+    try:
+        # Lancer Wifite pour détecter les réseaux
+        subprocess.run(["sudo", "wifite"], check=True)
+    except KeyboardInterrupt:
+        print("\n[INFO] Scan interrompu par l'utilisateur.")
+    except Exception as e:
+        print(f"[ERREUR] Une erreur s'est produite : {e}")
+
+def launch_wps_attack():
+    """
+    Lance une attaque ciblée sur les réseaux Wi-Fi avec WPS activé.
+    """
+    print("[INFO] Lancement de l'attaque WPS (à des fins éducatives uniquement)...")
+    try:
+        subprocess.run(["sudo", "wifite", "--wps"], check=True)
+    except Exception as e:
+        print(f"[ERREUR] Une erreur s'est produite : {e}")
+
+def main():
+    """
+    Menu principal pour l'automatisation des tests de sécurité Wi-Fi.
+    """
+    print("=== Automatisation des Tests de Sécurité Wi-Fi ===")
+    print("1. Vérifier les dépendances")
+    print("2. Scanner les réseaux Wi-Fi")
+    print("3. Lancer une attaque WPS")
+    print("4. Quitter")
+    
+    while True:
+        try:
+            choix = int(input("\nEntrez votre choix : "))
+            if choix == 1:
+                check_dependencies()
+            elif choix == 2:
+                start_scan()
+            elif choix == 3:
+                launch_wps_attack()
+            elif choix == 4:
+                print("[INFO] Fin du script.")
+                break
+            else:
+                print("[ERREUR] Choix invalide. Veuillez entrer un nombre entre 1 et 4.")
+        except ValueError:
+            print("[ERREUR] Entrée invalide. Veuillez entrer un nombre.")
+        except KeyboardInterrupt:
+            print("\n[INFO] Script interrompu par l'utilisateur.")
+            break
+
+if __name__ == "__main__":
+    # Vérifiez les permissions root
+    if os.geteuid() != 0:
+        print("[ERREUR] Ce script doit être exécuté avec des permissions root.")
+        print("Exécutez-le avec : sudo python3 script_name.py")
+        exit(1)
+    
+    main()
